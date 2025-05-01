@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getLocationService } from '../../api/locationService';
+import { getLocationService, Location } from '../../api/locationService';
 import { useNavigate } from 'react-router';
 import { AutoComplete, DatePicker, InputNumber, Button, Space } from 'antd';
 import type { InputNumberProps } from 'antd';
@@ -7,17 +7,20 @@ import { SearchOutlined } from '@ant-design/icons';
 
 const { RangePicker } = DatePicker;
 
-interface Location {
-    id: number;
-    tenViTri: string;
-    tinhThanh: string;
-    quocGia: string;
-    hinhAnh: string;
+
+
+function toSlug(str: string) {
+    return str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '-')
+        .toLowerCase();
 }
 
 export default function LocationPage() {
     const [locations, setLocations] = useState<Location[]>([]);
-    const [selectedLocation, setSelectedLocation] = useState<string>('');
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
     const [guestCount, setGuestCount] = useState<number>(1);
     const navigate = useNavigate();
 
@@ -31,15 +34,6 @@ export default function LocationPage() {
         }
     };
 
-    const formatLocationName = (name: string) => {
-        return name
-            .toLowerCase()
-            .normalize('NFD')  // Tách dấu ra
-            .replace(/[\u0300-\u036f]/g, '')  // Xóa dấu
-            .replace(/\s+/g, '-')  // Thay khoảng trắng bằng -
-            .replace(/[^a-zA-Z0-9-]/g, '');  // Xóa ký tự đặc biệt
-    };
-
     const onChangeGuest: InputNumberProps['onChange'] = (value) => {
         setGuestCount(Number(value));
     };
@@ -47,6 +41,18 @@ export default function LocationPage() {
     useEffect(() => {
         fetchLocation();
     }, []);
+
+    const handleSelect = (value: string) => {
+        const location = locations.find((loc) => loc.tenViTri === value);
+        setSelectedLocation(location || null);
+    };
+
+    const handleSearch = () => {
+        if (selectedLocation) {
+            const slug = toSlug(selectedLocation.tenViTri);
+            navigate(`/rooms/${slug}?id=${selectedLocation.id}`);
+        }
+    };
 
     return (
         <div className="flex items-center justify-between rounded-full border border-gray-300 px-6 py-4 shadow-md bg-white w-full max-w-5xl mx-auto mb-6 relative">
@@ -57,7 +63,7 @@ export default function LocationPage() {
                     options={locations.map((loc) => ({
                         value: loc.tenViTri,
                         label: (
-                            <div key={loc.id} className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2">
                                 <img
                                     src={loc.hinhAnh}
                                     alt=""
@@ -66,11 +72,12 @@ export default function LocationPage() {
                                 <span>{loc.tenViTri}</span>
                             </div>
                         ),
+                        key: `${loc.id}-${loc.tenViTri}`,
                     }))}
                     placeholder="Bạn sắp đi đâu?"
                     className="w-full text-center"
                     bordered={false}
-                    onChange={(value: string) => setSelectedLocation(value)}
+                    onSelect={handleSelect}
                 />
             </div>
 
@@ -101,12 +108,8 @@ export default function LocationPage() {
                 shape="circle"
                 icon={<SearchOutlined />}
                 size="large"
-                onClick={() => {
-                    if (selectedLocation) {
-                        const formattedLocation = formatLocationName(selectedLocation);
-                        navigate(`/rooms/${formattedLocation}`);
-                    }
-                }}
+                onClick={handleSearch}
+                disabled={!selectedLocation}
                 className="bg-pink-500 ml-4 hover:bg-pink-600 border-none text-white"
             />
         </div>
