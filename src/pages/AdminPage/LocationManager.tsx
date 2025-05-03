@@ -1,5 +1,5 @@
 import { useState, useMemo, useTransition, useEffect } from 'react';
-import {  addLocationService, deleteLocationService, getLocationSearchService, Location, updateLocationService } from '../../api/locationService'
+import { addLocationService, deleteLocationService, getLocationSearchService, Location, updateLocationService } from '../../api/locationService'
 import debounce from 'lodash/debounce';
 import React from 'react';
 import { Button, Input, Spin, Table, Modal, Form } from 'antd';

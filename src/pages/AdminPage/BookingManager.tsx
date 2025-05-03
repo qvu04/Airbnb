@@ -141,7 +141,6 @@ export default function BookingManager() {
                     }
                 }}
             >
-                {/* Các trường giống update */}
                 {renderBookingFormFields()}
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="w-full">Thêm</Button>
