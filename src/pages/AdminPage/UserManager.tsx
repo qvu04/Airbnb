@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState, useTransition } from 'react';
-import { Input, Spin, Table, Button, Modal } from 'antd';
+import { Input, Spin, Table, Button, Modal, Form, DatePicker, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import debounce from 'lodash/debounce';
-import { AddUser, addUserService, deleteUserService, getUserService, UserType } from '../../api/userService';
+import { addUserService, deleteUserService, getUserService, updateUserService, UserType } from '../../api/userService';
 import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../main';
+import dayjs from 'dayjs';
 
 
 
@@ -16,17 +15,10 @@ export default function UserManager() {
     const [totalUsers, setTotalUsers] = useState(0);
     const [keyword, setKeyword] = useState('');
     const [isPending, startTransition] = useTransition();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [addUserForm, setAddUserForm] = useState<AddUser>({
-        id: 0,
-        name: '',
-        email: '',
-        password: '',
-        phone: '',
-        birthday: '',
-        gender: 'true',
-        role: 'ADMIN'
-    });
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [editingUsers, setEditingUsers] = useState<UserType | null>(null);
+    const [form] = Form.useForm();
     // Gọi API lấy danh sách user
     const fetchUsers = async (page: number, size: number, search: string) => {
         try {
@@ -38,21 +30,9 @@ export default function UserManager() {
         }
     };
 
-    // Thêm user
-    const handleAddUser = async () => {
-        try {
-            await addUserService(addUserForm);
-            setIsModalOpen(false);
-            toast.success('Thêm người dùng thành công!');
-            fetchUsers(pageIndex, pageSize, keyword);
-        } catch (error) {
-            console.error('Thêm người dùng thất bại', error);
-        }
-    };
     const handleDeleteUser = async (userId: number) => {
         try {
             await deleteUserService(userId);
-            console.log('✌️userId --->', userId);
             toast.success('Xóa người dùng thành công');
             fetchUsers(pageIndex, pageSize, keyword)
         } catch (error) {
@@ -84,40 +64,106 @@ export default function UserManager() {
         setKeyword(value);
         debouncedSearch(trimValue);
     };
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
-
-    // Modal form
     const renderAddUserModal = () => (
-        <Modal title="Thêm người dùng" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <div className="grid grid-cols-2 gap-4">
-                <Input placeholder="Tên" value={addUserForm.name} onChange={(e) => setAddUserForm({ ...addUserForm, name: e.target.value })} />
-                <Input placeholder="Email" value={addUserForm.email} onChange={(e) => setAddUserForm({ ...addUserForm, email: e.target.value })} />
-                <Input placeholder="Số điện thoại" value={addUserForm.phone} onChange={(e) => setAddUserForm({ ...addUserForm, phone: e.target.value })} />
-                <Input placeholder="Ngày sinh" type="date" value={addUserForm.birthday} onChange={(e) => setAddUserForm({ ...addUserForm, birthday: e.target.value })} />
-                <Input placeholder="Mật khẩu" type="password" value={addUserForm.password} onChange={(e) => setAddUserForm({ ...addUserForm, password: e.target.value })} />
-                <select value={addUserForm.gender} onChange={(e) => setAddUserForm({ ...addUserForm, gender: e.target.value })} className="border rounded px-2 py-1">
-                    <option value="true">Nam</option>
-                    <option value="false">Nữ</option>
-                </select>
-                <select value={addUserForm.role} onChange={(e) => setAddUserForm({ ...addUserForm, role: e.target.value })} className="border rounded px-2 py-1">
-                    <option value="ADMIN">Admin</option>
-                    <option value="USER">User</option>
-                </select>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-                <Button type="primary" onClick={handleAddUser}>Thêm</Button>
-                <Button onClick={handleCancel}>Hủy</Button>
-            </div>
+        <Modal
+            title="Thêm quản trị viên"
+            open={isAddModalOpen}
+            onCancel={() => {
+                setIsAddModalOpen(false);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    try {
+                        const payload = {
+                            ...values,
+                        };
+                        await addUserService(payload);
+                        toast.success("Thêm user thành công");
+                        setIsAddModalOpen(false);
+                        form.resetFields();
+                        fetchUsers(pageIndex, pageSize, keyword);
+                    } catch (err) {
+                        toast.error("Lỗi khi thêm user");
+                    }
+                }}
+            >
+                {renderUserFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Thêm</Button>
+                </Form.Item>
+            </Form>
         </Modal>
     );
+    const renderUpdateUserModal = () => (
+        <Modal
+            title="Cập nhật đặt phòng"
+            open={isUpdateModalOpen}
+            onCancel={() => {
+                setIsUpdateModalOpen(false);
+                setEditingUsers(null);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    if (!editingUsers) return;
+                    try {
+                        const payload = { ...editingUsers, ...values };
+                        await updateUserService(payload);
+                        toast.success("Cập nhật user thành công");
+                        setIsUpdateModalOpen(false);
+                        setEditingUsers(null);
+                        form.resetFields();
+                        fetchUsers(pageIndex, pageSize, keyword);
+                    } catch (err) {
+                        toast.error("Lỗi khi cập nhật phòng");
+                    }
+                }}
+            >
+                {renderUserFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Cập nhật</Button>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
+    const renderUserFormFields = () => (
+        <>
+            <Form.Item name="name" label="Họ tên" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="birthday" label="Sinh nhật" rules={[{ required: true }]}>
+                <DatePicker className="w-full" />
+            </Form.Item>
+            <Form.Item name="gender" label="Giới tính" rules={[{ required: true }]}>
+                <Select className="w-full" placeholder="Chọn giới tính">
+                    <Select.Option value={true}>Nam</Select.Option>
+                    <Select.Option value={false}>Nữ</Select.Option>
+                </Select>
+            </Form.Item>
+            <Form.Item name="role" label="Vai trò" rules={[{ required: true }]}>
+                <Select className="w-full" placeholder="Chọn vai trò">
+                    <Select.Option value="ADMIN">ADMIN</Select.Option>
+                    <Select.Option value="USER">USER</Select.Option>
+                </Select>
+            </Form.Item>
 
+        </>
+    );
     const columns: ColumnsType<UserType> = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -136,10 +182,21 @@ export default function UserManager() {
             key: 'action',
             render: (_, record: UserType) => (
                 <div className="flex gap-2">
-                    <Button type="primary">Sửa</Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setEditingUsers(record);
+                            form.setFieldsValue({
+                                ...record,
+                                birthday: record.birthday ? dayjs(record.birthday) : null,
+                            });
+                            setIsUpdateModalOpen(true);
+                        }}
+                    >
+                        Sửa
+                    </Button>
                     <Button onClick={() => {
                         handleDeleteUser(record.id);
-
                     }} danger>Xoá</Button>
                 </div >
             ),
@@ -153,7 +210,7 @@ export default function UserManager() {
     return (
         <div className="p-4 bg-white rounded-xl shadow-md">
             <div className="mb-5 flex justify-between items-center">
-                <Button type="primary" onClick={showModal}>Thêm người dùng</Button>
+                <Button type="primary" onClick={isAddModalOpen ? () => setIsAddModalOpen(false) : () => setIsAddModalOpen(true)}>Thêm quản trị viên</Button>
                 <Input
                     placeholder="Tìm kiếm người dùng..."
                     value={keyword}
@@ -177,6 +234,7 @@ export default function UserManager() {
             />
 
             {renderAddUserModal()}
+            {renderUpdateUserModal()}
         </div>
     );
 }

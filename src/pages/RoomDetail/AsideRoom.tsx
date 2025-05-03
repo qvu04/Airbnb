@@ -59,9 +59,6 @@ export default function AsideRoom() {
             soLuongKhach: guestCount,
             maNguoiDung: user.id,
         };
-
-        console.log("Booking payload:", payload);
-
         try {
             await postBookingService(payload);
             toast.success("Đặt phòng thành công");
@@ -85,7 +82,7 @@ export default function AsideRoom() {
                 <img
                     src={roomDetail.hinhAnh}
                     alt={roomDetail.tenPhong}
-                    className="w-full h-96 object-cover rounded-xl shadow-2xl cursor-pointer hover:opacity-90 transition"
+                    className="w-full h-full object-cover rounded-xl shadow-2xl cursor-pointer hover:opacity-90 transition"
                     onClick={() => setIsModalOpen(true)}
                 />
             </div>

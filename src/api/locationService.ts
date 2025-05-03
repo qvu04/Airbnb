@@ -1,6 +1,5 @@
 import { https } from "./config"
 import axios from 'axios';
-import { AddUser } from './userService';
 
 export interface Location {
     id: number;
@@ -16,7 +15,13 @@ export interface AddLocation {
     quocGia: string;
     hinhAnh: string;
 }
-
+export interface UpdateLocation {
+    id: number;
+    tenViTri: string;
+    tinhThanh: string;
+    quocGia: string;
+    hinhAnh: string;
+}
 export const getLocationService = () => {
     return https.get("/api/vi-tri");
 }
@@ -44,4 +49,7 @@ export const addLocationService = (location: AddLocation) => {
 }
 export const deleteLocationService = (id: number) => {
     return https.delete(`/api/vi-tri/${id}`);
+}
+export const updateLocationService = (location: UpdateLocation) => {
+    return https.put(`/api/vi-tri/${location.id}`, location);
 }

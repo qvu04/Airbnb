@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { useState, useTransition, useMemo } from 'react';
-import { addBookingService, BookedRooms, deleteBookingService, getBookingService } from '../../api/bookroomService';
+import { addBookingService, BookedRooms, deleteBookingService, getBookingService, updateBookingService } from '../../api/bookroomService';
 import debounce from 'lodash/debounce';
-import { Button, Input, Spin, Table, Modal, InputNumber, DatePicker } from 'antd';
+import { Button, Input, Spin, Table, Modal, InputNumber, DatePicker, Form } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -15,16 +15,10 @@ export default function BookingManager() {
     const [pageSize, setPageSize] = useState(10);
     const [keyword, setKeyword] = useState('');
     const [isPending, startTransition] = useTransition();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [addBookingForm, setAddBookingForm] = useState<BookedRooms>({
-        id: 0,
-        maPhong: 0,
-        maNguoiDung: 0,
-        ngayDen: '',
-        ngayDi: '',
-        soLuongKhach: 0,
-    })
-
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [editingBooking, setEditingBooking] = useState<BookedRooms | null>(null);
+    const [form] = Form.useForm();
 
     const fetchBooking = async () => {
         try {
@@ -37,18 +31,6 @@ export default function BookingManager() {
             console.log('✌️error --->', error);
         }
     };
-    const hanldeAddBooking = async () => {
-        try {
-            await addBookingService(addBookingForm);
-            setIsModalOpen(false);
-            toast.success('Thêm đặt phòng thành công');
-            fetchBooking();
-        } catch (error) {
-            console.log('✌️error --->', error);
-
-        }
-
-    }
     const handleDeleteBooking = async (id: number) => {
         try {
             await deleteBookingService(id);
@@ -59,12 +41,12 @@ export default function BookingManager() {
             toast.error('Xóa đặt phòng thất bại');
         }
     }
+
     const debouncedSearch = useMemo(() => {
         return debounce((value: string) => {
             startTransition(() => {
                 const filtered = allBooking.filter(item =>
-                    item.maPhong.toString().includes(value) ||
-                    item.maNguoiDung.toString().includes(value)
+                    item.maPhong.toString().includes(value)
                 );
                 setFilteredBooking(filtered);
                 setPageIndex(1);
@@ -89,13 +71,7 @@ export default function BookingManager() {
         debouncedSearch(trimValue);
     };
 
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
     const columns: ColumnsType<BookedRooms> = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Mã phòng', dataIndex: 'maPhong', key: 'maPhong' },
@@ -109,7 +85,21 @@ export default function BookingManager() {
             key: 'action',
             render: (_, record: BookedRooms) => (
                 <div className="flex gap-2">
-                    <Button type="primary">Sửa</Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setEditingBooking(record);
+                            setIsUpdateModalOpen(true);
+                            form.setFieldsValue({
+                                ...record,
+                                ngayDen: dayjs(record.ngayDen),
+                                ngayDi: dayjs(record.ngayDi),
+                            });
+                        }}
+                    >
+                        Sửa
+                    </Button>
+
                     <Button onClick={() => {
                         handleDeleteBooking(record.id);
                     }} danger>Xoá</Button>
@@ -117,41 +107,117 @@ export default function BookingManager() {
             ),
         }
     ];
+
+    // Cú pháp es7
+    // bất đồng bộ thì phải có async await
     const renderAddBookingModal = () => (
-        <Modal title="Thêm đặt phòng" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <div className="grid grid-cols-2 gap-4">
-                <InputNumber placeholder="Mã người dùng" value={addBookingForm.maNguoiDung} onChange={(value) => setAddBookingForm({ ...addBookingForm, maNguoiDung: value ?? 0 })} className="w-full" />
-                <InputNumber placeholder="Mã Phòng" value={addBookingForm.maPhong} onChange={(value) => setAddBookingForm({ ...addBookingForm, maPhong: value ?? 0 })} className="w-full" />
-                <DatePicker
-                    placeholder="Ngày đến"
-                    className="w-full"
-                    value={addBookingForm.ngayDen ? dayjs(addBookingForm.ngayDen) : null}
-                    onChange={(date) => setAddBookingForm({ ...addBookingForm, ngayDen: date ? date.format('YYYY-MM-DD') : '' })}
-                />
-
-                <DatePicker
-                    placeholder="Ngày đi"
-                    className="w-full"
-                    value={addBookingForm.ngayDi ? dayjs(addBookingForm.ngayDi) : null}
-                    onChange={(date) => setAddBookingForm({ ...addBookingForm, ngayDi: date ? date.format('YYYY-MM-DD') : '' })}
-                />
-
-                <InputNumber placeholder="Số lượng khách" value={addBookingForm.soLuongKhach} onChange={(value) => setAddBookingForm({ ...addBookingForm, soLuongKhach: value ?? 0 })} className="w-full" />
-
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-                <Button type="primary" onClick={hanldeAddBooking}>Thêm đặt phòng</Button>
-                <Button onClick={handleCancel}>Hủy</Button>
-            </div>
+        <Modal
+            title="Thêm đặt phòng"
+            open={isAddModalOpen}
+            onCancel={() => {
+                setIsAddModalOpen(false);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    try {
+                        const payload = {
+                            ...values,
+                            ngayDen: values.ngayDen.format("YYYY-MM-DD"),
+                            ngayDi: values.ngayDi.format("YYYY-MM-DD"),
+                            id: 0,
+                        };
+                        await addBookingService(payload);
+                        toast.success("Thêm đặt phòng thành công");
+                        fetchBooking();
+                        setIsAddModalOpen(false);
+                        form.resetFields();
+                    } catch (err) {
+                        toast.error("Lỗi khi thêm đặt phòng");
+                    }
+                }}
+            >
+                {/* Các trường giống update */}
+                {renderBookingFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Thêm</Button>
+                </Form.Item>
+            </Form>
         </Modal>
     );
+
+    const renderUpdateBookingModal = () => (
+        <Modal
+            title="Cập nhật đặt phòng"
+            open={isUpdateModalOpen}
+            onCancel={() => {
+                setIsUpdateModalOpen(false);
+                setEditingBooking(null);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    if (!editingBooking) return;
+                    try {
+                        const payload = {
+                            ...values,
+                            id: editingBooking.id,
+                            ngayDen: values.ngayDen.format("YYYY-MM-DD"),
+                            ngayDi: values.ngayDi.format("YYYY-MM-DD"),
+                        };
+                        await updateBookingService(payload);
+                        toast.success("Cập nhật thành công");
+                        fetchBooking();
+                        setIsUpdateModalOpen(false);
+                        form.resetFields();
+                    } catch (err) {
+                        toast.error("Lỗi khi cập nhật đặt phòng");
+                    }
+                }}
+            >
+                {renderBookingFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Cập nhật</Button>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
+
+    const renderBookingFormFields = () => (
+        <>
+            <Form.Item name="maNguoiDung" label="Mã người dùng" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+            <Form.Item name="maPhong" label="Mã phòng" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+            <Form.Item name="ngayDen" label="Ngày đến" rules={[{ required: true }]}>
+                <DatePicker className="w-full" />
+            </Form.Item>
+            <Form.Item name="ngayDi" label="Ngày đi" rules={[{ required: true }]}>
+                <DatePicker className="w-full" />
+            </Form.Item>
+            <Form.Item name="soLuongKhach" label="Số lượng khách" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+        </>
+    );
+
     useEffect(() => {
         fetchBooking();
     }, [])
     return (
         <div className="p-4 bg-white rounded-xl shadow-md">
             <div className="mb-5 flex justify-between items-center">
-                <Button type="primary" onClick={showModal}>Thêm đặt phòng</Button>
+                <Button type="primary" onClick={isAddModalOpen ? () => setIsAddModalOpen(false) : () => setIsAddModalOpen(true)}>Thêm đặt phòng</Button>
                 <Input
                     placeholder="Tìm kiếm đặt phòng..."
                     value={keyword}
@@ -174,6 +240,7 @@ export default function BookingManager() {
                 onChange={handleTableChange}
             />
             {renderAddBookingModal()}
+            {renderUpdateBookingModal()}
         </div>
 
     );

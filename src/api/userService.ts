@@ -25,16 +25,6 @@ export interface UserType {
     gender: boolean;
     role: string;
 }
-export interface AddUser {
-    id: number,
-    name: string,
-    email: string,
-    password: string,
-    phone: string,
-    birthday: string,
-    gender: string,
-    role: string,
-}
 export const loginService = (user: LoginPayload) => {
     return https.post(`/api/auth/signin`, user);
 
@@ -44,9 +34,15 @@ export const registerService = (user: RegisterPayload) => {
 }
 export const uploadAvatarUserService = (file: File) => {
     const formData = new FormData();
-    formData.append("formFile", file);
-    return https.post(`/api/users/upload-avatar`, formData);
-}
+    formData.append("formFile", file); // ✅ Đúng theo yêu cầu backend
+
+    return https.post(`/api/users/upload-avatar`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
 export const getUserService = (
     pageIndex: number,
     pageSize: number,
@@ -63,7 +59,7 @@ export const getUserService = (
         }
     });
 };
-export const addUserService = (user: AddUser) => {
+export const addUserService = (user: UserType) => {
     return https.post(`/api/users`, user);
 }
 export const deleteUserService = (id: number) => {
@@ -71,3 +67,6 @@ export const deleteUserService = (id: number) => {
         params: { id }
     });
 };
+export const updateUserService = (user: UserType) => {
+    return https.put(`/api/users/${user.id}`, user);
+}   

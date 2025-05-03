@@ -15,7 +15,7 @@ export default function LoadingPage() {
                     height: "100vh",
                     background: "black",
                     zIndex: 9999,
-                    display: "flex",
+                    display: "flex",    
                     alignItems: "center",
                     justifyContent: "center",
                 }}

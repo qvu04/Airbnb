@@ -9,9 +9,52 @@ import { useNavigate } from 'react-router';
 export default function UserDetail() {
     const { user } = useSelector((state: RootState) => state.userSlice);
     const [avatarPreview, setAvatarPreview] = useState(user.avatar || '');
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const resizeImage = (file: File, size = 300): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                img.src = e.target?.result as string;
+            };
+
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d")!;
+                const minSize = Math.min(img.width, img.height);
+
+                // Crop ảnh từ chính giữa (center crop)
+                const cropX = (img.width - minSize) / 2;
+                const cropY = (img.height - minSize) / 2;
+
+                canvas.width = size;
+                canvas.height = size;
+                ctx.drawImage(
+                    img,
+                    cropX,
+                    cropY,
+                    minSize,
+                    minSize,
+                    0,
+                    0,
+                    size,
+                    size
+                );
+
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject(new Error("Resize failed"));
+                }, file.type);
+            };
+
+            reader.onerror = (err) => reject(err);
+            reader.readAsDataURL(file);
+        });
+    };
+
     const handleFileChange = (e: any) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -20,23 +63,25 @@ export default function UserDetail() {
     };
     const handleUpload = async () => {
         if (!selectedFile) return;
-
         try {
-            const res = await uploadAvatarUserService(selectedFile);
+            const resizedBlob = await resizeImage(selectedFile); // ⬅️ resized image
+            const resizedFile = new File([resizedBlob], selectedFile.name, { type: selectedFile.type });
+
+            const res = await uploadAvatarUserService(resizedFile);
             const updatedAvatar = res.data.content.avatar;
 
-            // Cập nhật Redux & localStorage
             const updatedUser = { ...user, avatar: updatedAvatar };
             dispatch(setUserLoginAction(updatedUser));
             localStorage.setItem("user", JSON.stringify(updatedUser));
             setAvatarPreview(updatedAvatar);
 
-            toast.error("Tải ảnh thành công!");
+            toast.success("Tải ảnh thành công!");
         } catch (err) {
             console.error(err);
             toast.error("Tải ảnh thất bại!");
         }
     };
+
     return (
         <div className="w-80 bg-white border rounded-xl shadow-md p-6 mx-auto">
             {/* Avatar */}

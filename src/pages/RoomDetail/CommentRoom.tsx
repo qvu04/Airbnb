@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CommentsTheoMaPhong, getCommentService, postCommentService, PostComment } from "../../api/commentService";
 import moment from "moment";
-import { Flex, Rate } from "antd";
+import { Rate } from "antd";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { RootState } from "../../main";
@@ -55,6 +55,7 @@ export default function CommentRoom({ maPhong, maNguoiDung }: CommentRoomProps) 
             };
 
             setComments([newComment, ...comments]);
+
             setNoiDung("");
             setSaoBinhLuan(5);
         } catch (err) {
@@ -92,7 +93,7 @@ export default function CommentRoom({ maPhong, maNguoiDung }: CommentRoomProps) 
 
                 <button
                     onClick={handlePostComment}
-                    className="mt-3 bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded"
+                    className="cursor-pointer mt-3 bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded"
                 >
                     Đánh giá
                 </button>

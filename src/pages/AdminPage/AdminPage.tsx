@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../main'
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import UserManager from './UserManager';
 import LocationManager from './LocationManager';
 import {
@@ -15,26 +15,42 @@ import { useDispatch } from 'react-redux';
 import { setUserLogoutAction } from '../LoginPage/redux/userSlice';
 import BookingManager from './BookingManager';
 import RoomManager from './RoomManager';
+import { hideLoading, showLoading } from '../../components/Loading/redux/loadingSlice';
 const { Header, Sider, Content } = Layout;
 
 export default function AdminPage() {
     const { user } = useSelector((state: RootState) => state.userSlice);
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
-    const [selectedKey, setSelectedKey] = useState('user');
+    const [selectedKey, setSelectedKey] = useState('users');
     const dispatch = useDispatch();
-    const checkAdmin = () => {
-        if (user?.role === "ADMIN") {
-            return navigate("/admin")
-        } else {
-            return navigate("/");
+    const checkAdmin = async () => {
+        dispatch(showLoading());
+        try {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (user?.role === "ADMIN") {
+                return navigate("/admin")
+            } else {
+                return navigate("/");
+            }
+        } finally {
+            dispatch(hideLoading());
         }
 
+
     }
-    const handleLogout = () => {
-        dispatch(setUserLogoutAction());
-        navigate("/login");
-    }
+    const handleLogout = async () => {
+        dispatch(showLoading());
+        try {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            dispatch(setUserLogoutAction());
+            navigate("/login");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            dispatch(hideLoading());
+        }
+    };
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
@@ -70,22 +86,21 @@ export default function AdminPage() {
         { key: 'rooms', icon: <DesktopOutlined />, label: 'RoomManager' },
         { key: 'booking', icon: <SmileFilled />, label: 'BookingManager' }
     ];
-
-    const userMenu = (
-        <Menu>
-            <Menu.Item key="logout">
-                <a href="/logout" className="text-red-500 font-medium">Đăng xuất</a>
-            </Menu.Item>
-        </Menu>
-    );
+    <Menu>
+        <Menu.Item key="logout">
+            <a href="/logout" className="text-red-500 font-medium">Đăng xuất</a>
+        </Menu.Item>
+    </Menu>
 
     return (
         <Layout className="min-h-screen h-full bg-[#e672b1] ">
             <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed} className="bg-[#001529] h-screen">
-                <div className="text-2xl font-bold text-pink-400 flex items-center p-10 gap-2">
-                    <i className="text-3xl fab fa-airbnb"></i>
-                    airbnb
-                </div>
+                <Link to="/">
+                    <div className="text-2xl font-bold text-pink-400 flex items-center p-10 gap-2">
+                        <i className="text-3xl fab fa-airbnb"></i>
+                        airbnb
+                    </div>
+                </Link>
                 <Menu
                     theme="dark"
                     mode="inline"
@@ -102,9 +117,6 @@ export default function AdminPage() {
                         <button onClick={handleLogout} className="ml-2 rounded text-[#e672b1] font-medium cursor-pointer ">Đăng xuất</button>
                     </div>
                 </Header>
-                <div className='flex items-center justify-center font-bold text-2xl gap-2'>Chào mừng bạn đến với trang ADMIN
-                    <i className="fab fa-angellist"></i>
-                </div>
                 <Content className="p-6 bg-white shadow-md min-h-screen">
                     {renderContent()}
                 </Content>

@@ -1,8 +1,8 @@
 import { useState, useMemo, useTransition, useEffect } from 'react';
-import { AddLocation, addLocationService, deleteLocationService, getLocationSearchService, Location } from '../../api/locationService'
+import {  addLocationService, deleteLocationService, getLocationSearchService, Location, updateLocationService } from '../../api/locationService'
 import debounce from 'lodash/debounce';
 import React from 'react';
-import { Button, Input, Spin, Table, Modal } from 'antd';
+import { Button, Input, Spin, Table, Modal, Form } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import toast from 'react-hot-toast';
 
@@ -13,14 +13,10 @@ export default function LocationManager() {
     const [pageSize, setPageSize] = useState(10);
     const [keyword, setKeyword] = useState('');
     const [isPending, startTransition] = useTransition();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [addLocationForm, setAddLocationForm] = useState<AddLocation>({
-        id: 0,
-        tenViTri: '',
-        tinhThanh: '',
-        quocGia: '',
-        hinhAnh: '',
-    });
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [editingLocations, setEditingLocations] = useState<Location | null>(null);
+    const [form] = Form.useForm();
     const fetchLocation = async (page: number, size: number, search: string) => {
         try {
             const res = await getLocationSearchService(page, size, search);
@@ -31,22 +27,13 @@ export default function LocationManager() {
 
         }
     }
-    const handleAddLocation = async () => {
-        try {
-            await addLocationService(addLocationForm);
-            setIsModalOpen(false);
-            toast.success('Thêm vị trí thành công');
-            fetchLocation(pageIndex, pageSize, keyword);
-        } catch (error) {
-            console.error('Thêm người dùng thất bại', error);
-        }
-    }
     const handleDeleteLocation = async (id: number) => {
         try {
             await deleteLocationService(id);
             toast.success('Xóa vị trí thành công');
             fetchLocation(pageIndex, pageSize, keyword);
         } catch (error) {
+            console.log('✌️error --->', error);
 
         }
     }
@@ -70,14 +57,6 @@ export default function LocationManager() {
         setKeyword(value);
         debouncedSearch(trimValue);
     };
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
     const columns: ColumnsType<Location> = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Tên vị trí', dataIndex: 'tenViTri', key: 'tenViTri' },
@@ -96,7 +75,16 @@ export default function LocationManager() {
             key: 'action',
             render: (_, record: Location) => (
                 <div className="flex gap-2">
-                    <Button type="primary">Sửa</Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setEditingLocations(record);
+                            form.setFieldsValue(record); // Gán dữ liệu vào form
+                            setIsUpdateModalOpen(true);
+                        }}
+                    >
+                        Sửa
+                    </Button>
                     <Button onClick={() => {
                         handleDeleteLocation(record.id);
                     }} danger>Xoá</Button>
@@ -105,18 +93,93 @@ export default function LocationManager() {
         }
     ];
     const renderAddLocationModal = () => (
-        <Modal title="Thêm người dùng" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <div className="grid grid-cols-2 gap-4">
-                <Input placeholder="Tên vị trí" value={addLocationForm.tenViTri} onChange={(e) => setAddLocationForm({ ...addLocationForm, tenViTri: e.target.value })} />
-                <Input placeholder="Tỉnh thành" value={addLocationForm.tinhThanh} onChange={(e) => setAddLocationForm({ ...addLocationForm, tinhThanh: e.target.value })} />
-                <Input placeholder="Quốc gia" value={addLocationForm.quocGia} onChange={(e) => setAddLocationForm({ ...addLocationForm, quocGia: e.target.value })} />
-                <Input placeholder="Hình ảnh" value={addLocationForm.hinhAnh} onChange={(e) => setAddLocationForm({ ...addLocationForm, hinhAnh: e.target.value })} />
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-                <Button type="primary" onClick={handleAddLocation}>Thêm</Button>
-                <Button onClick={handleCancel}>Hủy</Button>
-            </div>
+        <Modal
+            title="Thêm vị trí"
+            open={isAddModalOpen}
+            onCancel={() => {
+                setIsAddModalOpen(false);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    try {
+                        const payload = {
+                            ...values,
+                        };
+                        await addLocationService(payload);
+                        toast.success("Thêm vị trí thành công");
+                        setIsAddModalOpen(false);
+                        form.resetFields();
+                        fetchLocation(pageIndex, pageSize, keyword);
+                    } catch (err) {
+                        toast.error("Lỗi khi thêm vị trí");
+                    }
+                }}
+            >
+                {renderBookingFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Thêm</Button>
+                </Form.Item>
+            </Form>
         </Modal>
+    );
+
+    const renderUpdateLocationModal = () => (
+        <Modal
+            title="Cập nhật vị trí"
+            open={isUpdateModalOpen}
+            onCancel={() => {
+                setIsUpdateModalOpen(false);
+                setEditingLocations(null);
+                form.resetFields();
+            }}
+            footer={null}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                    if (!editingLocations) return;
+                    try {
+                        const payload = { ...editingLocations, ...values };
+                        await updateLocationService(payload);
+                        toast.success("Cập nhật vị trí thành công");
+                        setIsUpdateModalOpen(false);
+                        setEditingLocations(null);
+                        form.resetFields();
+                        fetchLocation(pageIndex, pageSize, keyword);
+                    } catch (err) {
+                        toast.error("Lỗi khi cập nhật vị trí");
+                    }
+                }}
+            >
+                {renderBookingFormFields()}
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full">Cập nhật</Button>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
+
+    const renderBookingFormFields = () => (
+        <>
+            <Form.Item name="tenViTri" label="Tên vị trí" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="tinhThanh" label="Tỉnh thành" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="quocGia" label="Quốc gia" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+            <Form.Item name="hinhAnh" label="Hình ảnh" rules={[{ required: true }]}>
+                <Input className="w-full" />
+            </Form.Item>
+        </>
     );
     useEffect(() => {
         fetchLocation(pageIndex, pageSize, keyword);
@@ -124,7 +187,7 @@ export default function LocationManager() {
     return (
         <div className="p-4 bg-white rounded-xl shadow-md">
             <div className="mb-5 flex justify-between items-center">
-                <Button type="primary" onClick={showModal}>Thêm ví trí</Button>
+                <Button type="primary" onClick={isAddModalOpen ? () => setIsAddModalOpen(false) : () => setIsAddModalOpen(true)}>Thêm vị trí</Button>
                 <Input
                     placeholder="Tìm kiếm vị trí..."
                     value={keyword}
@@ -147,6 +210,7 @@ export default function LocationManager() {
                 onChange={handleTableChange}
             />
             {renderAddLocationModal()}
+            {renderUpdateLocationModal()}
         </div>
     );
 }

@@ -39,7 +39,7 @@ export default function LocationList() {
     }, []);
 
     return (
-        <div className="grid grid-cols-4 gap-6 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
             {locations.map((location) => (
                 <div
                     onClick={() => handleSearch(location)}

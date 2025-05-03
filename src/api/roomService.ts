@@ -57,3 +57,9 @@ export const getRoomSearchService = (
 export const addRoomService = (room: RoomDetailType) => {
     return https.post(`/api/phong-thue`, room);
 }
+export const deleteRoomService = (id: number) => {
+    return https.delete(`/api/phong-thue/${id}`);
+}
+export const updateRoomService = (room: RoomDetailType) => {
+    return https.put(`/api/phong-thue/${room.id}`, room);
+}

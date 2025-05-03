@@ -1,5 +1,6 @@
 import axios from "axios";
 import { https, CYBER_TOKEN } from './config';
+import BookedRoom from "../pages/DoashBoardPage/BookedRoom";
 
 export interface BookedRooms {
     id: number,
@@ -17,7 +18,14 @@ export interface AddBooking {
     soLuongKhach: number,
     maNguoiDung: number
 }
-
+export interface UpdateBooking {
+    id: number,
+    maPhong: number,
+    ngayDen: string,
+    ngayDi: string,
+    soLuongKhach: number,
+    maNguoiDung: number
+}
 export const getBookedRoomService = (maNguoiDung: number) => {
     return https.get(`/api/dat-phong/lay-theo-nguoi-dung/${maNguoiDung}`);
 }
@@ -34,5 +42,6 @@ export const addBookingService = (booking: AddBooking) => {
 export const deleteBookingService = (id: number) => {
     return https.delete(`/api/dat-phong/${id}`);
 }
-
-
+export const updateBookingService = (booking: UpdateBooking) => {
+    return https.put(`/api/dat-phong/${booking.id}`, booking);
+};

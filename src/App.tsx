@@ -14,6 +14,7 @@ import AdminPage from './pages/AdminPage/AdminPage'
 import UserManager from './pages/AdminPage/UserManager'
 import LocationManager from './pages/AdminPage/LocationManager'
 import RoomManager from './pages/AdminPage/RoomManager'
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
 
 function App() {
 
@@ -35,8 +36,9 @@ function App() {
             <Route path="location" element={<LocationManager />} />
             <Route path="room" element={<RoomManager />} />
           </Route>
-
+          <Route path='*' element={<NotFoundPage />}></Route>
         </Routes>
+
       </BrowserRouter>
     </>
   )
