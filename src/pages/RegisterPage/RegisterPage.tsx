@@ -1,6 +1,6 @@
 
 import { Form, Input, Button, DatePicker, Select, Typography } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { registerService, RegisterPayload } from '../../api/userService';
 
@@ -104,7 +104,7 @@ export default function RegisterPage() {
                         </Button>
                         <div className="text-center mt-4">
                             <span>Đã có tài khoản? </span>
-                            <a href="/login" className="text-blue-500 hover:underline">Đăng nhập ngay</a>
+                            <Link to="/login" className="text-blue-500 hover:underline">Đăng nhập ngay</Link>
                         </div>
                     </Form.Item>
                 </Form>

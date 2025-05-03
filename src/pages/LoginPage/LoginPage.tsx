@@ -1,7 +1,7 @@
 
 import { Form, Input, Button, Typography, Checkbox } from 'antd';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { loginService, LoginPayload } from '../../api/userService';
 import { setUserLoginAction } from './redux/userSlice';
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
                     <div className="text-center mt-4 text-sm">
                         <Text>Bạn chưa có tài khoản? </Text>
-                        <a href="/register" className="text-blue-500 hover:underline">Đăng ký ngay!</a>
+                        <Link to="/register" className="text-blue-500 hover:underline">Đăng ký ngay!</Link>
                     </div>
                 </Form>
             </div>
