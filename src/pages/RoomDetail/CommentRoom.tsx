@@ -65,8 +65,14 @@ export default function CommentRoom({ maPhong, maNguoiDung }: CommentRoomProps) 
             {/* Form nhập bình luận */}
             <div className="bg-white p-4 rounded shadow mb-6">
                 <div className="flex items-center mb-2">
-                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full mr-2" />
-                    <span className="font-semibold">{user.name}</span>
+                    {user ? (
+                        <>
+                            <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full mr-2" />
+                            <span className="font-semibold">{user.name}</span>
+                        </>
+                    ) : (
+                        <span className="text-red-500">Vui lòng đăng nhập để bình luận</span>
+                    )}
                 </div>
 
                 <div className="mb-2">

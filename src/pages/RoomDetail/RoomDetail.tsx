@@ -8,10 +8,11 @@ import { RootState } from '../../main';
 export default function RoomDetail() {
     const { roomId } = useParams();
     const { user } = useSelector((state: RootState) => state.userSlice);
+    const maNguoiDung = user?.id || null
     return (
         <div>
             <AsideRoom />
-            <CommentRoom maNguoiDung={user.id} maPhong={Number(roomId)} />
+            <CommentRoom maNguoiDung={maNguoiDung} maPhong={Number(roomId)} />
         </div>
     )
 }
