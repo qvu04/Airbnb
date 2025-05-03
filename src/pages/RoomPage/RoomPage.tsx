@@ -74,7 +74,7 @@ export default function RoomPage() {
                         Chỗ ở tại khu vực bạn đã chọn
                     </h1>
                     <Link className="font-bold cursor-pointer" to="/">
-                        Bạn muốn muốn chọn khu vực khác - Click vào đây !
+                        Bạn muốn chọn khu vực khác - Click vào đây !
                     </Link>
                 </div>
 
