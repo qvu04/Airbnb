@@ -1,6 +1,5 @@
 import axios from "axios";
 import { https, CYBER_TOKEN } from './config';
-import BookedRoom from "../pages/DoashBoardPage/BookedRoom";
 
 export interface BookedRooms {
     id: number,

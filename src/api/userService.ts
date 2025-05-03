@@ -1,6 +1,5 @@
 import axios from "axios";
 import { https } from "./config"
-import { identity } from "lodash";
 
 export interface LoginPayload {
     email: string,

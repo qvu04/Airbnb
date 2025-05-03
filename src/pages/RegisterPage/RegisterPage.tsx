@@ -1,8 +1,7 @@
-import React from 'react';
+
 import { Form, Input, Button, DatePicker, Select, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import moment from 'moment';
 import { registerService, RegisterPayload } from '../../api/userService';
 
 const { Title } = Typography;

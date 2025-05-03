@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import Header from '../../components/Header/Header'
 import FooterPage from '../../components/Footer/Footer'
 import { Layout } from 'antd'
