@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { getLocationService, Location } from '../../api/locationService';
 import { useNavigate } from 'react-router';
 import { AutoComplete, DatePicker, InputNumber, Button, Space } from 'antd';

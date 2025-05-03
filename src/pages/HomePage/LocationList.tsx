@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { getLocationListService } from '../../api/locationService';
 import { useNavigate } from 'react-router';
 
