@@ -41,7 +41,7 @@ const Header = () => {
       {/* Video Background */}
       <video
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
-        src="/public/myVideo.mp4"
+        src="/myVideo.mp4"
         autoPlay
         muted
         loop
