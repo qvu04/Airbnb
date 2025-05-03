@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BookedRooms, getBookedRoomService } from '../../api/bookroomService'
 import { getRoomDetailService } from '../../api/roomService'
 import { useSelector } from 'react-redux'

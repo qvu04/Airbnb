@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Drawer, DrawerProps } from 'antd';
-import { CheckDesktop, CheckMobilePhone, CheckTablet } from '../../HOC/ResponsiveCustom';
+import { CheckMobilePhone, CheckTablet } from '../../HOC/ResponsiveCustom';
 
 const DrawerMobileAndTablet: React.FC = () => {
     const [open, setOpen] = useState(false);
