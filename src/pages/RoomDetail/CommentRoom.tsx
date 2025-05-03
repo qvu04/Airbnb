@@ -45,17 +45,7 @@ export default function CommentRoom({ maPhong, maNguoiDung }: CommentRoomProps) 
         try {
             await postCommentService(payload);
             toast.success("Gửi bình luận thành công");
-            const newComment = {
-                id: 0,
-                avatar: user.avatar,
-                tenNguoiBinhLuan: user.name,
-                ngayBinhLuan: new Date().toISOString(),
-                noiDung,
-                saoBinhLuan,
-            };
-
-            setComments([newComment, ...comments]);
-
+            await fetchComment(maPhong);
             setNoiDung("");
             setSaoBinhLuan(5);
         } catch (err) {
