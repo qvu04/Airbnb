@@ -86,12 +86,6 @@ export default function AdminPage() {
         { key: 'rooms', icon: <DesktopOutlined />, label: 'RoomManager' },
         { key: 'booking', icon: <SmileFilled />, label: 'BookingManager' }
     ];
-    <Menu>
-        <Menu.Item key="logout">
-            <a href="/logout" className="text-red-500 font-medium">Đăng xuất</a>
-        </Menu.Item>
-    </Menu>
-
     return (
         <Layout className="min-h-screen h-full bg-[#e672b1] ">
             <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed} className="bg-[#001529] h-screen">
