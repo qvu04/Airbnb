@@ -63,124 +63,95 @@ export default function RoomPage() {
     }, [id]);
 
     return (
-        <>
-            <div className="container mx-auto px-4 py-8">
-
-                <div className="mb-6">
-                    <p className="text-gray-600 text-sm">
-                        Có {rooms.length} chỗ ở tại {locationId} • 27/04/2025 – 04/05/2025
-                    </p>
-                    <h1 className="text-2xl font-bold mt-2">
-                        Chỗ ở tại khu vực bạn đã chọn
-                    </h1>
-                    <Link className="font-bold cursor-pointer" to="/">
-                        Bạn muốn chọn khu vực khác - Click vào đây !
+        <div className="flex flex-col lg:flex-row gap-6 px-4 py-8 max-w-screen-xl mx-auto">
+            {/* Danh sách phòng */}
+            <div className="flex-1 space-y-6">
+                <div className="text-center mb-6">
+                    <h1 className="text-3xl font-bold">Chỗ ở tại khu vực bạn đã chọn</h1>
+                    <Link className="text-blue-600 font-medium hover:underline mt-2 inline-block" to="/">
+                        Bạn muốn chọn khu vực khác? Click vào đây!
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6">
-                    {rooms.map((room) => (
-                        <div key={room.id}>
-                            <CheckDesktop>
-                                <Link
-                                    className="flex cursor-pointer bg-white rounded-lg shadow-md overflow-hidden"
-                                    to={`/rooms/${locationId}/${room.id}`}
-                                >
+                {rooms.map((room) => (
+                    <div key={room.id}>
+                        <CheckDesktop>
+                            <Link
+                                className="flex cursor-pointer bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                                to={`/rooms/${locationId}/${room.id}`}
+                            >
+                                <div className="relative w-1/3">
+                                    <img
+                                        src={room.hinhAnh}
+                                        alt={room.tenPhong}
+                                        className="w-full h-48 object-cover rounded-l-xl"
+                                    />
+                                </div>
 
-                                    <div className="relative w-1/3">
-                                        <img
-                                            src={room.hinhAnh}
-                                            alt={room.tenPhong}
-                                            className="w-full h-48 object-cover"
+                                <div className="p-4 flex-1">
+                                    <h2 className="text-xl font-semibold truncate">{room.tenPhong}</h2>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
+                                    </p>
+                                    <p className="text-lg font-bold mt-2">${room.giaTien} / đêm</p>
+                                </div>
+                            </Link>
+                        </CheckDesktop>
 
-                                        />
-                                        <button className="absolute top-2 right-2 text-gray-600 hover:text-red-500">
-                                            <svg
-                                                className="w-6 h-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                                ></path>
-                                            </svg>
-                                        </button>
-                                    </div>
+                        <CheckTablet>
+                            <Link
+                                className="flex flex-col cursor-pointer bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+                                to={`/rooms/${locationId}/${room.id}`}
+                            >
+                                <img
+                                    src={room.hinhAnh}
+                                    alt={room.tenPhong}
+                                    className="w-full h-60 object-cover"
+                                />
+                                <div className="p-4">
+                                    <h2 className="text-lg font-semibold">{room.tenPhong}</h2>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
+                                    </p>
+                                    <p className="text-lg font-bold mt-2">${room.giaTien} / đêm</p>
+                                </div>
+                            </Link>
+                        </CheckTablet>
 
-                                    <div className="p-4 flex-1">
-                                        <h2 className="text-lg font-semibold truncate">
-                                            {room.tenPhong}
-                                        </h2>
-                                        <p className="text-gray-600 text-sm mt-1">
-                                            {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
-                                        </p>
-                                        <p className="text-lg font-bold mt-2">
-                                            ${room.giaTien} / đêm
-                                        </p>
-                                    </div>
-
-                                </Link>
-                            </CheckDesktop>
-                            <CheckTablet>
-                                <Link
-                                    className="flex flex-col cursor-pointer bg-white rounded-lg shadow-md overflow-hidden"
-                                    to={`/rooms/${locationId}/${room.id}`}
-                                >
-                                    <div className="relative w-full">
-                                        <img
-                                            src={room.hinhAnh}
-                                            alt={room.tenPhong}
-                                            className="w-full h-60 object-cover"
-                                        />
-                                        <button className="absolute top-2 right-2 text-gray-600 hover:text-red-500">
-                                            {/* SVG Heart */}
-                                        </button>
-                                    </div>
-
-                                    <div className="p-4">
-                                        <h2 className="text-lg font-semibold">{room.tenPhong}</h2>
-                                        <p className="text-gray-600 text-sm mt-1">
-                                            {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
-                                        </p>
-                                        <p className="text-lg font-bold mt-2">${room.giaTien} / đêm</p>
-                                    </div>
-                                </Link>
-                            </CheckTablet>
-                            <CheckMobilePhone>
-                                <Link
-                                    className="flex flex-col cursor-pointer bg-white rounded-lg shadow-md overflow-hidden"
-                                    to={`/rooms/${locationId}/${room.id}`}
-                                >
-                                    <div className="relative w-full">
-                                        <img
-                                            src={room.hinhAnh}
-                                            alt={room.tenPhong}
-                                            className="w-full h-60 object-cover"
-                                        />
-                                        <button className="absolute top-2 right-2 text-gray-600 hover:text-red-500">
-                                            {/* SVG Heart */}
-                                        </button>
-                                    </div>
-
-                                    <div className="p-4">
-                                        <h2 className="text-lg font-semibold">{room.tenPhong}</h2>
-                                        <p className="text-gray-600 text-sm mt-1">
-                                            {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
-                                        </p>
-                                        <p className="text-lg font-bold mt-2">${room.giaTien} / đêm</p>
-                                    </div>
-                                </Link>
-                            </CheckMobilePhone>
-                        </div>
-                    ))}
-                </div>
-
+                        <CheckMobilePhone>
+                            <Link
+                                className="flex flex-col cursor-pointer bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+                                to={`/rooms/${locationId}/${room.id}`}
+                            >
+                                <img
+                                    src={room.hinhAnh}
+                                    alt={room.tenPhong}
+                                    className="w-full h-60 object-cover"
+                                />
+                                <div className="p-4">
+                                    <h2 className="text-lg font-semibold">{room.tenPhong}</h2>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        {room.khach} khách • {room.phongNgu} phòng ngủ • {room.giuong} giường • {room.phongTam} phòng tắm • {getAmenities(room)}
+                                    </p>
+                                    <p className="text-lg font-bold mt-2">${room.giaTien} / đêm</p>
+                                </div>
+                            </Link>
+                        </CheckMobilePhone>
+                    </div>
+                ))}
             </div>
-        </>
+
+            {/* Bản đồ chỉ hiển thị trên desktop */}
+            <div className="lg:w-[40%] w-full h-[400px] lg:h-[600px] sticky top-24 rounded-xl overflow-hidden shadow-xl hidden lg:block">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.5026947706565!2d106.6584303152602!3d10.771707792323955!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3beaaaad1f%3A0x847ffb652e74b99e!2zVHLGsOG7nW5nIMSQaeG7h24gdGjDoG5oIHRwIEjhu5MgQ2jDrSBNw61uaA!5e0!3m2!1svi!2s!4v1628861394379!5m2!1svi!2s"
+                    width="100%"
+                    height="100%"
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+            </div>
+        </div>
     );
 }
