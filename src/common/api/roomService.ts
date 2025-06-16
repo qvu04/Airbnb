@@ -1,3 +1,4 @@
+import { BookingPayload } from "./bookroomService";
 import { https } from "./config";
 import axios from 'axios';
 
@@ -20,13 +21,6 @@ export interface RoomDetailType {
     hoBoi: boolean;
     banUi: boolean;
     hinhAnh: string;
-}
-export interface BookingPayload {
-    maPhong: number,
-    ngayDen: string,
-    ngayDi: string,
-    soLuongKhach: number,
-    maNguoiDung: number
 }
 export const getRoomService = (locationId: string) => {
     return https.get(`/api/phong-thue/lay-phong-theo-vi-tri?maViTri=${locationId}`);

@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState, useTransition } from 'react';
 import { Input, Spin, Table, Button, Modal, Form, DatePicker, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import debounce from 'lodash/debounce';
-import { addUserService, deleteUserService, getUserService, updateUserService, UserType } from '../../api/userService';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import { addUserService, deleteUserService, getUserService, updateUserService, UserType } from '../../common/api/userService';
 
 
 

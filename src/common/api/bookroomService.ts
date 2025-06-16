@@ -9,16 +9,7 @@ export interface BookedRooms {
     soLuongKhach: number,
     maNguoiDung: number
 }
-export interface AddBooking {
-    id: number,
-    maPhong: number,
-    ngayDen: string,
-    ngayDi: string,
-    soLuongKhach: number,
-    maNguoiDung: number
-}
-export interface UpdateBooking {
-    id: number,
+export interface BookingPayload {
     maPhong: number,
     ngayDen: string,
     ngayDi: string,
@@ -35,12 +26,12 @@ export const getBookingService = () => {
         },
     });
 };
-export const addBookingService = (booking: AddBooking) => {
+export const addBookingService = (booking: BookedRooms) => {
     return https.post(`/api/dat-phong`, booking);
 }
 export const deleteBookingService = (id: number) => {
     return https.delete(`/api/dat-phong/${id}`);
 }
-export const updateBookingService = (booking: UpdateBooking) => {
+export const updateBookingService = (booking: BookedRooms) => {
     return https.put(`/api/dat-phong/${booking.id}`, booking);
 };

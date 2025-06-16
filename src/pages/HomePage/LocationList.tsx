@@ -1,14 +1,6 @@
-import  { useEffect, useState } from 'react'
-import { getLocationListService } from '../../api/locationService';
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router';
-
-interface LocationList {
-    id: number,
-    tenViTri: string,
-    tinhThanh: string,
-    quocGia: string,
-    hinhAnh: string,
-}
+import { getLocationListService, Location } from '../../common/api/locationService';
 
 function toSlug(str: string) {
     return str
@@ -20,16 +12,16 @@ function toSlug(str: string) {
 }
 
 export default function LocationList() {
-    const [locations, setLocations] = useState<LocationList[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
     const navigate = useNavigate();
 
     const getLocationList = async () => {
         const res = await getLocationListService(1, 8);
-        const data: LocationList[] = res.data.content.data;
+        const data: Location[] = res.data.content.data;
         setLocations(data);
     }
 
-    const handleSearch = (location: LocationList) => {
+    const handleSearch = (location: Location) => {
         const slug = toSlug(location.tenViTri);
         navigate(`/rooms/${slug}?id=${location.id}`);
     };

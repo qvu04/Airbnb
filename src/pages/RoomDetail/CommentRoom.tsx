@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { CommentsTheoMaPhong, getCommentService, postCommentService, PostComment } from "../../api/commentService";
 import moment from "moment";
 import { Rate } from "antd";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { RootState } from "../../main";
+import { CommentsTheoMaPhong, getCommentService, PostComment, postCommentService } from "../../common/api/commentService";
 
 interface CommentRoomProps {
     maPhong: number;

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { BookedRooms, deleteBookingService, getBookedRoomService } from '../../api/bookroomService'
-import { getRoomDetailService } from '../../api/roomService'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../main'
 import { CheckDesktop, CheckMobilePhone, CheckTablet } from '../../components/HOC/ResponsiveCustom'
 import { Link } from 'react-router-dom';
 import { Button } from 'antd'
 import toast from 'react-hot-toast'
+import { BookedRooms, deleteBookingService, getBookedRoomService } from '../../common/api/bookroomService';
+import { getRoomDetailService } from '../../common/api/roomService';
 
 interface EnrichedBooking extends BookedRooms {
     roomDetail: {

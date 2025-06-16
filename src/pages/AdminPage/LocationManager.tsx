@@ -1,10 +1,10 @@
 import { useState, useMemo, useTransition, useEffect } from 'react';
-import { addLocationService, deleteLocationService, getLocationSearchService, Location, updateLocationService } from '../../api/locationService'
 import debounce from 'lodash/debounce';
 import React from 'react';
 import { Button, Input, Spin, Table, Modal, Form } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import toast from 'react-hot-toast';
+import { addLocationService, deleteLocationService, getLocationSearchService, Location, updateLocationService } from '../../common/api/locationService';
 
 export default function LocationManager() {
     const [locations, setLocations] = useState<Location[]>([]);

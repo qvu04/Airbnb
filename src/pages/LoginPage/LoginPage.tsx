@@ -1,13 +1,11 @@
-
 import { Form, Input, Button, Typography, Checkbox } from 'antd';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { loginService, LoginPayload } from '../../api/userService';
 import { setUserLoginAction } from './redux/userSlice';
 import { AppDispatch } from '../../main';
-import { https } from '../../api/config';
-
+import { LoginPayload, loginService } from '../../common/api/userService';
+import { https } from '../../common/api/config';
 const { Text, Title } = Typography;
 
 export default function LoginPage() {

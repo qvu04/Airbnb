@@ -2,10 +2,10 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../main'
 import { setUserLoginAction } from '../LoginPage/redux/userSlice';
-import { uploadAvatarUserService } from '../../api/userService';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { uploadAvatarUserService } from '../../common/api/userService';
 export default function UserDetail() {
     const { user } = useSelector((state: RootState) => state.userSlice);
     const [avatarPreview, setAvatarPreview] = useState(user.avatar || '');

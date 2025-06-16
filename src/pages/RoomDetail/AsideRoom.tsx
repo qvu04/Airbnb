@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { getRoomDetailService, postBookingService, BookingPayload, RoomDetailType } from '../../api/roomService'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Modal, DatePicker, InputNumber, Button } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../main'
+import { getRoomDetailService, postBookingService, RoomDetailType } from '../../common/api/roomService'
+import { BookingPayload } from '../../common/api/bookroomService'
 
 
 

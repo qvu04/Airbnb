@@ -1,28 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getRoomService } from '../../api/roomService';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { CheckDesktop, CheckMobilePhone, CheckTablet } from '../../components/HOC/ResponsiveCustom';
+import { getRoomService, RoomDetailType } from '../../common/api/roomService';
 
-interface Room {
-    id: number;
-    tenPhong: string;
-    khach: number;
-    phongNgu: number;
-    giuong: number;
-    phongTam: number;
-    moTa: string;
-    giaTien: number;
-    mayGiat: boolean;
-    banLa: boolean;
-    tivi: boolean;
-    dieuHoa: boolean;
-    wifi: boolean;
-    bep: boolean;
-    doXe: boolean;
-    hoBoi: boolean;
-    banUi: boolean;
-    hinhAnh: string;
-}
 
 export default function RoomPage() {
     const { locationId } = useParams();
@@ -30,19 +10,19 @@ export default function RoomPage() {
     const searchParams = new URLSearchParams(location.search);
     const id = searchParams.get('id');
 
-    const [rooms, setRooms] = useState<Room[]>([]);
+    const [rooms, setRooms] = useState<RoomDetailType[]>([]);
 
     const fetchRooms = async (id: string) => {
         try {
             const res = await getRoomService(id);
-            const data: Room[] = res.data.content;
+            const data: RoomDetailType[] = res.data.content;
             setRooms(data);
         } catch (error) {
             console.log('✌️error --->', error);
         }
     };
 
-    const getAmenities = (room: Room) => {
+    const getAmenities = (room: RoomDetailType) => {
         const amenities: string[] = [];
         if (room.wifi) amenities.push("Wifi");
         if (room.mayGiat) amenities.push("Máy giặt");

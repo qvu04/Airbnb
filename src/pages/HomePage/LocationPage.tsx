@@ -1,14 +1,11 @@
-import  { useEffect, useState } from 'react';
-import { getLocationService, Location } from '../../api/locationService';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AutoComplete, DatePicker, InputNumber, Button, Space } from 'antd';
 import type { InputNumberProps } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { CheckDesktop, CheckMobilePhone, CheckTablet } from '../../components/HOC/ResponsiveCustom';
-
+import { getLocationService, Location } from '../../common/api/locationService';
 const { RangePicker } = DatePicker;
-
-
 
 function toSlug(str: string) {
     return str

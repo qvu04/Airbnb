@@ -8,20 +8,6 @@ export interface Location {
     quocGia: string;
     hinhAnh: string;
 }
-export interface AddLocation {
-    id: number;
-    tenViTri: string;
-    tinhThanh: string;
-    quocGia: string;
-    hinhAnh: string;
-}
-export interface UpdateLocation {
-    id: number;
-    tenViTri: string;
-    tinhThanh: string;
-    quocGia: string;
-    hinhAnh: string;
-}
 export const getLocationService = () => {
     return https.get("/api/vi-tri");
 }
@@ -44,12 +30,12 @@ export const getLocationSearchService = (
         }
     });
 };
-export const addLocationService = (location: AddLocation) => {
+export const addLocationService = (location: Location) => {
     return https.post(`/api/vi-tri`, location);
 }
 export const deleteLocationService = (id: number) => {
     return https.delete(`/api/vi-tri/${id}`);
 }
-export const updateLocationService = (location: UpdateLocation) => {
+export const updateLocationService = (location: Location) => {
     return https.put(`/api/vi-tri/${location.id}`, location);
 }

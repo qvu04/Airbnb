@@ -1,9 +1,7 @@
-
 import { Form, Input, Button, DatePicker, Select, Typography } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { registerService, RegisterPayload } from '../../api/userService';
-
+import { RegisterPayload, registerService } from '../../common/api/userService';
 const { Title } = Typography;
 
 export default function RegisterPage() {
