@@ -62,7 +62,6 @@ export default function BookedRoom() {
 
     return (
         <div className="p-4">
-            <p className='font-bold text-3xl'>Xin chào tôi là {user.name}</p>
             <h2 className="text-xl font-bold mb-4">Phòng đã thuê</h2>
             {enrichedRooms.length === 0 ? (
                 <p>Bạn chưa đặt phòng nào.</p>

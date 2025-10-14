@@ -10,6 +10,7 @@ export default function UserDetail() {
     const { user } = useSelector((state: RootState) => state.userSlice);
     const [avatarPreview, setAvatarPreview] = useState(user.avatar || '');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const resizeImage = (file: File, size = 300): Promise<Blob> => {
@@ -96,7 +97,7 @@ export default function UserDetail() {
                         </svg>
                     )}
                 </div>
-
+                <p className='font-bold text-xl'>{user.name}</p>
                 <label className="mt-3 text-blue-600 text-sm cursor-pointer hover:underline">
                     Cập nhật ảnh
                     <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />

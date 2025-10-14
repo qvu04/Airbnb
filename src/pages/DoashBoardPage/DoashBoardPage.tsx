@@ -7,7 +7,7 @@ export default function DoashBoardPage() {
     return (
         <>
 
-            <div className="min-h-screen bg-gray-50 flex justify-center items-center py-10 px-4 gap-10 flex-wrap md:flex-wrap lg:flex-nowrap">
+            <div className="min-h-screen flex justify-center items-center py-10 px-4 gap-10 flex-wrap md:flex-wrap lg:flex-nowrap">
                 <div >
                     <UserDetail />
                 </div>
