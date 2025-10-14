@@ -11,10 +11,8 @@ export interface CommentsTheoMaPhong {
 export interface PostComment {
     id: number,
     maPhong: number,
-    ngayDen: string,
-    ngayDi: string,
-    soLuongKhach: number,
-    maNguoiDung: number,
+    ngayBinhLuan: string,
+    maNguoiBinhLuan: number,
     noiDung: string,
     saoBinhLuan: number
 }

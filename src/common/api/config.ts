@@ -2,7 +2,7 @@ import axios from 'axios';
 import { store } from '../../main';
 import { hideLoading, showLoading } from '../../components/Loading/redux/loadingSlice';
 
-export const CYBER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA3OSIsIkhldEhhblN0cmluZyI6IjA1LzA5LzIwMjUiLCJIZXRIYW5UaW1lIjoiMTc1NzAzMDQwMDAwMCIsIm5iZiI6MTcyOTcyODAwMCwiZXhwIjoxNzU3MjAzMjAwfQ.8L6s48bhKNlI81VIJQ7GZJzwrZ2qGOzRK9OtGlTQ0VUeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA3OSIsIkhldEhhblN0cmluZyI6IjA1LzA5LzIwMjUiLCJIZXRIYW5UaW1lIjoiMTc1NzAzMDQwMDAwMCIsIm5iZiI6MTcyOTcyODAwMCwiZXhwIjoxNzU3MjAzMjAwfQ.8L6s48bhKNlI81VIJQ7GZJzwrZ2qGOzRK9OtGlTQ0VU";
+export const CYBER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJBSSBPZmZpY2UgMTEiLCJIZXRIYW5TdHJpbmciOiIxNC8wNS8yMDI2IiwiSGV0SGFuVGltZSI6IjE3Nzg3MTY4MDAwMDAiLCJuYmYiOjE3NjQwOTM2MDAsImV4cCI6MTc3ODg2ODAwMH0.YEZVs6ZqIqm0bsnZATZbj-N6xum1AIEZY7FWC5Zp7gY";
 
 const userJson = localStorage.getItem("user");
 let userInfo = null;

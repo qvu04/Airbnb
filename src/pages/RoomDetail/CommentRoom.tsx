@@ -34,10 +34,8 @@ export default function CommentRoom({ maPhong, maNguoiDung }: CommentRoomProps) 
         const payload: PostComment = {
             id: 0,
             maPhong,
-            maNguoiDung: maNguoiDung,
-            ngayDen: new Date().toISOString(),
-            ngayDi: new Date().toISOString(),
-            soLuongKhach: 1,
+            maNguoiBinhLuan: maNguoiDung,
+            ngayBinhLuan: new Date().toISOString(),
             noiDung,
             saoBinhLuan,
         };
