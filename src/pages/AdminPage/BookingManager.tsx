@@ -1,12 +1,26 @@
-import React, { useEffect } from 'react'
-import { useState, useTransition, useMemo } from 'react';
-
-import debounce from 'lodash/debounce';
+import React, { useEffect, useMemo, useState, useTransition } from 'react';
 import { Button, Input, Spin, Table, Modal, InputNumber, DatePicker, Form } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import debounce from 'lodash/debounce';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { addBookingService, BookedRooms, deleteBookingService, getBookingService, updateBookingService } from '../../common/api/bookroomService';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/vi';
+
+import {
+    addBookingService,
+    BookedRooms,
+    deleteBookingService,
+    getBookingService,
+    updateBookingService,
+} from '../../common/api/bookroomService';
+
+// Cấu hình múi giờ Việt Nam
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.locale('vi');
+const VIETNAM_TZ = 'Asia/Ho_Chi_Minh';
 
 export default function BookingManager() {
     const [allBooking, setAllBooking] = useState<BookedRooms[]>([]);
@@ -21,6 +35,7 @@ export default function BookingManager() {
     const [editingBooking, setEditingBooking] = useState<BookedRooms | null>(null);
     const [form] = Form.useForm();
 
+    // Lấy danh sách đặt phòng
     const fetchBooking = async () => {
         try {
             const res = await getBookingService();
@@ -32,6 +47,7 @@ export default function BookingManager() {
             console.log('✌️error --->', error);
         }
     };
+
     const handleDeleteBooking = async (id: number) => {
         try {
             await deleteBookingService(id);
@@ -41,12 +57,13 @@ export default function BookingManager() {
             console.log('✌️error --->', error);
             toast.error('Xóa đặt phòng thất bại');
         }
-    }
+    };
 
+    // Debounce search
     const debouncedSearch = useMemo(() => {
         return debounce((value: string) => {
             startTransition(() => {
-                const filtered = allBooking.filter(item =>
+                const filtered = allBooking.filter((item) =>
                     item.maPhong.toString().includes(value)
                 );
                 setFilteredBooking(filtered);
@@ -65,6 +82,7 @@ export default function BookingManager() {
         setPageIndex(pagination.current);
         setPageSize(pagination.pageSize);
     };
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         const trimValue = value.trim();
@@ -72,17 +90,32 @@ export default function BookingManager() {
         debouncedSearch(trimValue);
     };
 
-
+    // === CỘT TRONG BẢNG ===
     const columns: ColumnsType<BookedRooms> = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Mã phòng', dataIndex: 'maPhong', key: 'maPhong' },
-        { title: 'Ngày đến', dataIndex: 'ngayDen', key: 'ngayDen' },
-        { title: 'Ngày đi', dataIndex: 'ngayDi', key: 'ngayDi' },
+        {
+            title: 'Ngày đến',
+            dataIndex: 'ngayDen',
+            key: 'ngayDen',
+            render: (ngayDen: string) =>
+                ngayDen
+                    ? dayjs(ngayDen).tz(VIETNAM_TZ).format('DD/MM/YYYY HH:mm')
+                    : '',
+        },
+        {
+            title: 'Ngày đi',
+            dataIndex: 'ngayDi',
+            key: 'ngayDi',
+            render: (ngayDi: string) =>
+                ngayDi
+                    ? dayjs(ngayDi).tz(VIETNAM_TZ).format('DD/MM/YYYY HH:mm')
+                    : '',
+        },
         { title: 'Số lượng khách', dataIndex: 'soLuongKhach', key: 'soLuongKhach' },
         { title: 'Mã người dùng', dataIndex: 'maNguoiDung', key: 'maNguoiDung' },
-
         {
-            title: 'Action',
+            title: 'Hành động',
             key: 'action',
             render: (_, record: BookedRooms) => (
                 <div className="flex gap-2">
@@ -93,24 +126,59 @@ export default function BookingManager() {
                             setIsUpdateModalOpen(true);
                             form.setFieldsValue({
                                 ...record,
-                                ngayDen: dayjs(record.ngayDen),
-                                ngayDi: dayjs(record.ngayDi),
+                                ngayDen: dayjs(record.ngayDen).tz(VIETNAM_TZ),
+                                ngayDi: dayjs(record.ngayDi).tz(VIETNAM_TZ),
                             });
                         }}
                     >
                         Sửa
                     </Button>
 
-                    <Button onClick={() => {
-                        handleDeleteBooking(record.id);
-                    }} danger>Xoá</Button>
-                </div >
+                    <Button
+                        onClick={() => {
+                            handleDeleteBooking(record.id);
+                        }}
+                        danger
+                    >
+                        Xoá
+                    </Button>
+                </div>
             ),
-        }
+        },
     ];
 
-    // Cú pháp es7
-    // bất đồng bộ thì phải có async await
+    // === FORM ===
+    const renderBookingFormFields = () => (
+        <>
+            <Form.Item name="maNguoiDung" label="Mã người dùng" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+            <Form.Item name="maPhong" label="Mã phòng" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+            <Form.Item name="ngayDen" label="Ngày đến" rules={[{ required: true }]}>
+                <DatePicker
+                    className="w-full"
+                    format="DD/MM/YYYY HH:mm"
+                    showTime
+                    placeholder="Chọn ngày đến"
+                />
+            </Form.Item>
+            <Form.Item name="ngayDi" label="Ngày đi" rules={[{ required: true }]}>
+                <DatePicker
+                    className="w-full"
+                    format="DD/MM/YYYY HH:mm"
+                    showTime
+                    placeholder="Chọn ngày đi"
+                />
+            </Form.Item>
+            <Form.Item name="soLuongKhach" label="Số lượng khách" rules={[{ required: true }]}>
+                <InputNumber className="w-full" />
+            </Form.Item>
+        </>
+    );
+
+    // === MODAL THÊM ===
     const renderAddBookingModal = () => (
         <Modal
             title="Thêm đặt phòng"
@@ -128,28 +196,39 @@ export default function BookingManager() {
                     try {
                         const payload = {
                             ...values,
-                            ngayDen: values.ngayDen.format("YYYY-MM-DD"),
-                            ngayDi: values.ngayDi.format("YYYY-MM-DD"),
+                            ngayDen: values.ngayDen
+                                ? dayjs(values.ngayDen)
+                                    .tz(VIETNAM_TZ)
+                                    .format('YYYY-MM-DD HH:mm')
+                                : null,
+                            ngayDi: values.ngayDi
+                                ? dayjs(values.ngayDi)
+                                    .tz(VIETNAM_TZ)
+                                    .format('YYYY-MM-DD HH:mm')
+                                : null,
                             id: 0,
                         };
                         await addBookingService(payload);
-                        toast.success("Thêm đặt phòng thành công");
+                        toast.success('Thêm đặt phòng thành công');
                         fetchBooking();
                         setIsAddModalOpen(false);
                         form.resetFields();
                     } catch (err) {
-                        toast.error("Lỗi khi thêm đặt phòng");
+                        toast.error('Lỗi khi thêm đặt phòng');
                     }
                 }}
             >
                 {renderBookingFormFields()}
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="w-full">Thêm</Button>
+                    <Button type="primary" htmlType="submit" className="w-full">
+                        Thêm
+                    </Button>
                 </Form.Item>
             </Form>
         </Modal>
     );
 
+    // === MODAL CẬP NHẬT ===
     const renderUpdateBookingModal = () => (
         <Modal
             title="Cập nhật đặt phòng"
@@ -170,56 +249,52 @@ export default function BookingManager() {
                         const payload = {
                             ...values,
                             id: editingBooking.id,
-                            ngayDen: values.ngayDen.format("YYYY-MM-DD"),
-                            ngayDi: values.ngayDi.format("YYYY-MM-DD"),
+                            ngayDen: values.ngayDen
+                                ? dayjs(values.ngayDen)
+                                    .tz(VIETNAM_TZ)
+                                    .format('YYYY-MM-DD HH:mm')
+                                : null,
+                            ngayDi: values.ngayDi
+                                ? dayjs(values.ngayDi)
+                                    .tz(VIETNAM_TZ)
+                                    .format('YYYY-MM-DD HH:mm')
+                                : null,
                         };
                         await updateBookingService(payload);
-                        toast.success("Cập nhật thành công");
+                        toast.success('Cập nhật thành công');
                         fetchBooking();
                         setIsUpdateModalOpen(false);
                         form.resetFields();
                     } catch (err) {
-                        toast.error("Lỗi khi cập nhật đặt phòng");
+                        toast.error('Lỗi khi cập nhật đặt phòng');
                     }
                 }}
             >
                 {renderBookingFormFields()}
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="w-full">Cập nhật</Button>
+                    <Button type="primary" htmlType="submit" className="w-full">
+                        Cập nhật
+                    </Button>
                 </Form.Item>
             </Form>
         </Modal>
     );
 
-    const renderBookingFormFields = () => (
-        <>
-            <Form.Item name="maNguoiDung" label="Mã người dùng" rules={[{ required: true }]}>
-                <InputNumber className="w-full" />
-            </Form.Item>
-            <Form.Item name="maPhong" label="Mã phòng" rules={[{ required: true }]}>
-                <InputNumber className="w-full" />
-            </Form.Item>
-            <Form.Item name="ngayDen" label="Ngày đến" rules={[{ required: true }]}>
-                <DatePicker className="w-full" />
-            </Form.Item>
-            <Form.Item name="ngayDi" label="Ngày đi" rules={[{ required: true }]}>
-                <DatePicker className="w-full" />
-            </Form.Item>
-            <Form.Item name="soLuongKhach" label="Số lượng khách" rules={[{ required: true }]}>
-                <InputNumber className="w-full" />
-            </Form.Item>
-        </>
-    );
-
     useEffect(() => {
         fetchBooking();
-    }, [])
+    }, []);
+
     return (
         <div className="p-4 bg-white rounded-xl shadow-md">
             <div className="mb-5 flex justify-between items-center">
-                <Button type="primary" onClick={isAddModalOpen ? () => setIsAddModalOpen(false) : () => setIsAddModalOpen(true)}>Thêm đặt phòng</Button>
+                <Button
+                    type="primary"
+                    onClick={() => setIsAddModalOpen(true)}
+                >
+                    Thêm đặt phòng
+                </Button>
                 <Input
-                    placeholder="Tìm kiếm đặt phòng..."
+                    placeholder="Tìm kiếm theo mã phòng..."
                     value={keyword}
                     onChange={handleSearchChange}
                     className="w-full max-w-md"
@@ -242,6 +317,5 @@ export default function BookingManager() {
             {renderAddBookingModal()}
             {renderUpdateBookingModal()}
         </div>
-
     );
 }
