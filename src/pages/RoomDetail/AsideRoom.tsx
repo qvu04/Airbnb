@@ -17,8 +17,8 @@ export default function AsideRoom() {
     const [roomDetail, setRoomDetail] = useState<RoomDetailType | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [guestCount, setGuestCount] = useState(1);
-    const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
-    const [endDate, setEndDate] = useState<Dayjs | null>(dayjs().add(7, 'day'));
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const { user } = useSelector((state: RootState) => state.userSlice);
     useEffect(() => {
         const fetchRoomDetail = async () => {
@@ -32,10 +32,8 @@ export default function AsideRoom() {
     if (!roomDetail) return <div></div>;
 
     const calculateNights = () => {
-        if (startDate && endDate) {
-            return endDate.diff(startDate, 'day') || 1;
-        }
-        return 1;
+        if (!startDate || !endDate) return 0;
+        return endDate.diff(startDate, 'day');
     }
 
     const calculateTotal = () => {
@@ -171,7 +169,10 @@ export default function AsideRoom() {
                                     className="w-full"
                                     format="DD-MM-YYYY"
                                     value={startDate}
-                                    onChange={(date) => setStartDate(date)}
+                                    onChange={(date) => {
+                                        setStartDate(date);
+                                        setEndDate(null);
+                                    }}
                                     disabledDate={(current) => current && current < dayjs().startOf('day')}
                                 />
                             </div>
