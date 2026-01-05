@@ -88,7 +88,7 @@ export default function AdminPage() {
     ];
     return (
         <Layout className="min-h-screen h-full bg-[#e672b1] ">
-            <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed} className="bg-[#001529] h-screen">
+            <Sider collapsible collapsed={collapsed} onCollapse={toggleCollapsed} className="bg-[#001529]">
                 <Link to="/">
                     <div className="text-2xl font-bold text-pink-400 flex items-center p-10 gap-2">
                         <i className="text-3xl fab fa-airbnb"></i>
