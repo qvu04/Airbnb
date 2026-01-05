@@ -1,6 +1,6 @@
 import { Form, Input, Button, Typography, Checkbox } from "antd";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { setUserLoginAction } from "./redux/userSlice";
 import { AppDispatch } from "../../main";
@@ -12,7 +12,8 @@ const { Text, Title } = Typography;
 export default function LoginPage() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const from = location.state?.redirectTo || "/";
     const fetchUserLogin = async (formValues: { taiKhoan: string; matKhau: string }) => {
         try {
             const payload: LoginPayload = {
@@ -27,7 +28,7 @@ export default function LoginPage() {
             localStorage.setItem("user", JSON.stringify({ ...user, token }));
             https.defaults.headers.common["token"] = token;
             toast.success("Đăng nhập thành công!");
-            navigate("/");
+            navigate(from, { replace: true });
         } catch (error) {
             console.error("Đăng nhập thất bại:", error);
             toast.error("Đăng nhập thất bại!");

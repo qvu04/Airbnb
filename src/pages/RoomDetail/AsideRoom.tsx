@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Modal, DatePicker, InputNumber, Button } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import toast from 'react-hot-toast'
@@ -13,7 +13,7 @@ import { BookingPayload } from '../../common/api/bookroomService'
 export default function AsideRoom() {
     const { roomId } = useParams();
     const navigate = useNavigate();
-
+    const location = useLocation();
     const [roomDetail, setRoomDetail] = useState<RoomDetailType | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [guestCount, setGuestCount] = useState(1);
@@ -42,10 +42,17 @@ export default function AsideRoom() {
     }
     const handleBooking = async () => {
         if (!user) {
-            toast.error("Bạn cần đăng nhập để đặt phòng!");
+            toast.error("Bạn cần đăng nhập để tiếp tục đặt phòng!");
+            setTimeout(() => {
+                navigate("/login", {
+                    state: {
+                        redirectTo: location.pathname,
+                    },
+                });
+            }, 2000)
+
             return;
         }
-
         if (!startDate || !endDate) {
             toast.error("Vui lòng chọn ngày đến và ngày đi hợp lệ!");
             return;
